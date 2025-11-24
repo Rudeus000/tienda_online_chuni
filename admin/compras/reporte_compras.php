@@ -10,6 +10,10 @@
 date_default_timezone_set('America/Lima');
 
 $basePath = dirname(__DIR__, 2);
+if (!file_exists($basePath . '/config/supabase_config.php')) {
+    $basePath = dirname(__DIR__);
+}
+
 require_once $basePath . '/config/supabase_config.php';
 require_once $basePath . '/admin/fpdf/plantilla_reporte_compra.php';
 

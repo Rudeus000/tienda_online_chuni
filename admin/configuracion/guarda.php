@@ -7,6 +7,10 @@
  */
 
 $basePath = dirname(__DIR__, 2);
+if (!file_exists($basePath . '/config/supabase_config.php')) {
+    $basePath = dirname(__DIR__);
+}
+
 
 // Cargar primero supabase_config.php que maneja la sesión
 require_once $basePath . '/config/supabase_config.php';

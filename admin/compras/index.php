@@ -3,6 +3,10 @@
 
 
 $basePath = dirname(__DIR__, 2);
+if (!file_exists($basePath . '/config/supabase_config.php')) {
+    $basePath = dirname(__DIR__);
+}
+
 require_once $basePath . '/config/supabase_config.php';
 
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'admin') {
