@@ -62,9 +62,18 @@ if (isset($_ENV['SITE_URL'])) {
     }
     
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost:8000';
-    $scriptPath = dirname($_SERVER['SCRIPT_NAME']);
+    $scriptPath = dirname($_SERVER['SCRIPT_NAME'] ?? '/');
     $basePath = str_replace('\\', '/', $scriptPath);
-    if ($basePath !== '/' && $basePath !== '') {
+
+    // Si estamos dentro de /admin o cualquier subcarpeta, obtener la raíz del proyecto
+    $adminPos = strpos($basePath, '/admin');
+    if ($adminPos !== false) {
+        $basePath = substr($basePath, 0, $adminPos);
+    }
+
+    if ($basePath === '' || $basePath === false) {
+        $basePath = '/';
+    } elseif ($basePath !== '/') {
         $basePath = rtrim($basePath, '/') . '/';
     } else {
         $basePath = '/';
