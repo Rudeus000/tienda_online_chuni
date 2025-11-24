@@ -9,13 +9,36 @@
 // Configurar zona horaria de Perú
 date_default_timezone_set('America/Lima');
 
-$basePath = dirname(__DIR__, 2);
-if (!file_exists($basePath . '/config/supabase_config.php')) {
-    $basePath = dirname(__DIR__);
+if (!function_exists('resolveProjectRoot')) {
+    function resolveProjectRoot()
+    {
+        $candidates = [
+            dirname(__DIR__, 2),
+            dirname(__DIR__),
+            realpath(__DIR__ . '/..'),
+            realpath(__DIR__ . '/../..'),
+            $_SERVER['DOCUMENT_ROOT'] ?? null
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (!$candidate) {
+                continue;
+            }
+            $candidate = rtrim($candidate, '/\\');
+            if (!empty($candidate) && file_exists($candidate . '/config/supabase_config.php')) {
+                return $candidate;
+            }
+        }
+
+        return dirname(__DIR__, 2);
+    }
 }
 
-require_once $basePath . '/config/supabase_config.php';
-require_once $basePath . '/admin/fpdf/plantilla_reporte_compra.php';
+$projectRoot = resolveProjectRoot();
+$adminRoot = $projectRoot . '/admin';
+
+require_once $projectRoot . '/config/supabase_config.php';
+require_once $adminRoot . '/fpdf/plantilla_reporte_compra.php';
 
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'admin') {
     header('Location: ' . ADMIN_URL . 'index.php');
