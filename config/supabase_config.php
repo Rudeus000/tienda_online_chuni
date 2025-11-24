@@ -11,6 +11,13 @@ use App\StorageManager;
 // Configurar zona horaria de Perú ANTES de cualquier otra operación
 date_default_timezone_set('America/Lima');
 
+// Suprimir warnings de deprecación (PHP 8.4)
+// Estos warnings son de librerías externas (Guzzle, Dotenv) que aún no están completamente actualizadas para PHP 8.4
+// No afectan la funcionalidad, pero generan mucho ruido en los logs
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+ini_set('display_errors', '0'); // No mostrar errores en producción
+ini_set('log_errors', '1'); // Pero sí loggearlos
+
 // Cargar el autoload de Composer
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -28,7 +35,26 @@ if (isset($_ENV['SITE_URL'])) {
     define('SITE_URL', $_ENV['SITE_URL']);
 } else {
     // Detectar automáticamente desde el servidor
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    // Mejorar detección de HTTPS para servicios en la nube (Railway, Render, etc.)
+    $protocol = 'http';
+    
+    // Verificar múltiples indicadores de HTTPS
+    if (
+        (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+        (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||
+        (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on') ||
+        (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443) ||
+        // Detectar Railway, Render y otros servicios en la nube
+        (isset($_SERVER['HTTP_HOST']) && (
+            strpos($_SERVER['HTTP_HOST'], 'railway.app') !== false ||
+            strpos($_SERVER['HTTP_HOST'], 'render.com') !== false ||
+            strpos($_SERVER['HTTP_HOST'], 'vercel.app') !== false ||
+            strpos($_SERVER['HTTP_HOST'], 'herokuapp.com') !== false
+        ))
+    ) {
+        $protocol = 'https';
+    }
+    
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost:8000';
     $scriptPath = dirname($_SERVER['SCRIPT_NAME']);
     $basePath = str_replace('\\', '/', $scriptPath);

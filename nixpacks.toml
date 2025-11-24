@@ -7,5 +7,5 @@ cmds = [
 ]
 
 [start]
-cmd = "php -S 0.0.0.0:$PORT -t ."
+cmd = "php -d error_reporting='E_ALL & ~E_DEPRECATED & ~E_STRICT' -d display_errors=0 -d log_errors=1 -S 0.0.0.0:$PORT -t ."
 
