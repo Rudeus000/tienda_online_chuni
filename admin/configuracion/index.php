@@ -11,10 +11,34 @@ if (!file_exists($basePath . '/config/supabase_config.php')) {
     $basePath = dirname(__DIR__);
 }
 require_once $basePath . '/config/supabase_config.php';
-$projectRoot = $basePath;
-if (!file_exists($projectRoot . '/clases/cifrado.php')) {
-    $projectRoot = dirname($projectRoot);
+
+if (!function_exists('findProjectRoot')) {
+    /**
+     * Localiza la raíz del proyecto para cargar clases compartidas
+     */
+    function findProjectRoot(array $candidates)
+    {
+        foreach ($candidates as $candidate) {
+            if (!$candidate) {
+                continue;
+            }
+            $candidate = rtrim($candidate, '/\\');
+            if (!empty($candidate) && file_exists($candidate . '/clases/cifrado.php')) {
+                return $candidate;
+            }
+        }
+        return dirname(__DIR__, 2);
+    }
 }
+
+$projectRoot = findProjectRoot([
+    $basePath ?? null,
+    dirname(__DIR__),
+    dirname(__DIR__, 2),
+    dirname(__DIR__, 3),
+    realpath(__DIR__ . '/..')
+]);
+
 require_once $projectRoot . '/clases/cifrado.php';
 require_once __DIR__ . '/../clases/adminFunciones.php';
 
