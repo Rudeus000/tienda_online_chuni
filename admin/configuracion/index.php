@@ -11,7 +11,11 @@ if (!file_exists($basePath . '/config/supabase_config.php')) {
     $basePath = dirname(__DIR__);
 }
 require_once $basePath . '/config/supabase_config.php';
-require_once $basePath . '/clases/cifrado.php';
+$projectRoot = $basePath;
+if (!file_exists($projectRoot . '/clases/cifrado.php')) {
+    $projectRoot = dirname($projectRoot);
+}
+require_once $projectRoot . '/clases/cifrado.php';
 require_once __DIR__ . '/../clases/adminFunciones.php';
 
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'admin') {

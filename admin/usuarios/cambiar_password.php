@@ -12,7 +12,8 @@ if (!file_exists($basePath . '/config/supabase_config.php')) {
 }
 
 require_once $basePath . '/config/supabase_config.php';
-require_once $basePath . '/admin/clases/adminFunciones.php';
+$adminPath = dirname(__DIR__);
+require_once $adminPath . '/clases/adminFunciones.php';
 
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'admin') {
     header('Location: ' . ADMIN_URL . 'index.php');
