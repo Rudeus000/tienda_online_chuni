@@ -14,9 +14,11 @@ date_default_timezone_set('America/Lima');
 // Cargar el autoload de Composer
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-// Cargar variables de entorno
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load();
+// Cargar variables de entorno (solo si el archivo .env existe, si no usar variables del sistema)
+if (file_exists(__DIR__ . '/../.env')) {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+    $dotenv->load();
+}
 
 // Inicializar la base de datos
 

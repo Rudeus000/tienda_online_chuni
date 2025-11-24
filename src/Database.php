@@ -10,9 +10,11 @@ class Database {
     private $lastInsertId = null;
 
     private function __construct() {
-        // Cargar variables de entorno
-        $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-        $dotenv->load();
+        // Cargar variables de entorno (solo si el archivo .env existe)
+        if (file_exists(__DIR__ . '/../.env')) {
+            $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+            $dotenv->load();
+        }
 
         // Inicializar el cliente de Supabase
         $supabaseUrl = $_ENV['SUPABASE_URL'] ?? null;
