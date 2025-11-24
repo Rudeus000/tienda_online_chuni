@@ -40,25 +40,25 @@
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                 <div class="sb-sidenav-menu">
                     <div class="nav">
-                        <a class="nav-link" href="<?php echo ADMIN_URL; ?>configuracion">
+                        <a class="nav-link" href="<?php echo ADMIN_URL; ?>configuracion/index.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-store"></i></div>
                             Configuración
                         </a>
 
-                        <a class="nav-link" href="<?php echo ADMIN_URL; ?>usuarios">
+                        <a class="nav-link" href="<?php echo ADMIN_URL; ?>usuarios/index.php">
                             <div class="sb-nav-link-icon"><i class="fa fa-users"></i></div>
                             Usuarios
                         </a>
 
-                        <a class="nav-link" href="<?php echo ADMIN_URL; ?>categorias">
+                        <a class="nav-link" href="<?php echo ADMIN_URL; ?>categorias/index.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-layer-group"></i></div>
                             Categorías
                         </a>
-                        <a class="nav-link" href="<?php echo ADMIN_URL; ?>compras">
+                        <a class="nav-link" href="<?php echo ADMIN_URL; ?>compras/index.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-shopping-basket"></i></div>
                             Compras
                         </a>
-                        <a class="nav-link" href="<?php echo ADMIN_URL; ?>productos">
+                        <a class="nav-link" href="<?php echo ADMIN_URL; ?>productos/index.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-gifts"></i></div>
                             Productos
                         </a>
