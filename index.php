@@ -47,7 +47,7 @@ if (!empty($orderField)) {
 
 try {
     $result = $query->execute();
-    $data = $result->getData();
+    $data = extractSupabaseData($result);
     
     // Debug: Log para ver qué está retornando Supabase
     if (empty($data)) {

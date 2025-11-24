@@ -16,7 +16,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'admin') {
 
 // Verificar que sea una petición POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: index.php');
+    header('Location: ' . ADMIN_URL . 'productos/index.php');
     exit;
 }
 
@@ -24,16 +24,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $id = $_POST['id'] ?? '';
 
 if (empty($id)) {
-    header('Location: index.php');
+    header('Location: ' . ADMIN_URL . 'productos/index.php');
     exit;
 }
 
 try {
     // Actualizar producto a inactivo usando Supabase
     $db->update('productos', ['activo' => 0], 'id', $id);
-    header('Location: index.php?success=eliminado');
+    header('Location: ' . ADMIN_URL . 'productos/index.php?success=eliminado');
+    exit;
 } catch (Exception $e) {
     error_log('Error al eliminar producto: ' . $e->getMessage());
-    header('Location: index.php?error=eliminar');
+    header('Location: ' . ADMIN_URL . 'productos/index.php?error=eliminar');
+    exit;
 }
-exit;

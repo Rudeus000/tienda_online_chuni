@@ -54,7 +54,7 @@ if ($productos != null) {
                 ->single()
                 ->execute();
             
-            $data = $result->getData();
+            $data = extractSupabaseData($result);
             if ($data) {
                 $data['cantidad'] = $producto;
                 $lista_carrito[] = $data;

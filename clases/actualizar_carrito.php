@@ -60,7 +60,7 @@ function agregar($id, $cantidad)
                 ->single()
                 ->execute();
             
-            $producto = $result->getData();
+            $producto = extractSupabaseData($result);
             
             if ($producto) {
                 $descuento = $producto['descuento'];

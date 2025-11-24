@@ -27,7 +27,7 @@ try {
         ->order('fecha', ['ascending' => false])
         ->execute();
 
-    $compras = $response->getData() ?? [];
+    $compras = extractSupabaseData($response) ?? [];
 } catch (Throwable $e) {
     error_log('Error al obtener compras: ' . $e->getMessage());
 }

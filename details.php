@@ -23,7 +23,7 @@ try {
         ->limit(1)
         ->execute();
 
-    $data = $response->getData();
+    $data = extractSupabaseData($response);
     
     // Verificar si hay error en la respuesta
     if (is_array($data) && isset($data['code']) && isset($data['message'])) {

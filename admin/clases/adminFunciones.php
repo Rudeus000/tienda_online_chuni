@@ -24,24 +24,35 @@ function validaPassword($password, $repassword)
     return false;
 }
 
+function generarToken()
+{
+    return md5(uniqid(mt_rand(), false));
+}
+
 function usuarioExiste($usuario, $con)
 {
-    $sql = $con->prepare("SELECT id FROM usuarios WHERE usuario LIKE ? LIMIT 1");
-    $sql->execute([$usuario]);
-    if ($sql->fetchColumn() > 0) {
-        return true;
+    global $db;
+    
+    try {
+        $result = $db->selectOne('usuarios', 'id', ['usuario' => $usuario]);
+        return $result !== null && isset($result['id']);
+    } catch (\Throwable $e) {
+        error_log('Error en usuarioExiste: ' . $e->getMessage());
+        return false;
     }
-    return false;
 }
 
 function emailExiste($email, $con)
 {
-    $sql = $con->prepare("SELECT id FROM clientes WHERE email LIKE ? LIMIT 1");
-    $sql->execute([$email]);
-    if ($sql->fetchColumn() > 0) {
-        return true;
+    global $db;
+    
+    try {
+        $result = $db->selectOne('clientes', 'id', ['email' => $email]);
+        return $result !== null && isset($result['id']);
+    } catch (\Throwable $e) {
+        error_log('Error en emailExiste: ' . $e->getMessage());
+        return false;
     }
-    return false;
 }
 
 function mostrarMensajes($errors = [])
@@ -58,25 +69,40 @@ function mostrarMensajes($errors = [])
 
 function validaToken($id, $token, $con)
 {
+    global $db;
+    
     $msg = "";
-    $sql = $con->prepare("SELECT id FROM usuarios WHERE id = ? AND token LIKE ? LIMIT 1");
-    $sql->execute([$id, $token]);
-    if ($sql->fetchColumn() > 0) {
-        if (activarUsuario($id, $con)) {
-            $msg = "Cuenta activada.";
+    try {
+        $result = $db->selectOne('usuarios', 'id', ['id' => $id, 'token' => $token]);
+        
+        if ($result !== null && isset($result['id'])) {
+            if (activarUsuario($id, $con)) {
+                $msg = "Cuenta activada.";
+            } else {
+                $msg = "Error al activar cuenta.";
+            }
         } else {
-            $msg = "Error al activar cuenta.";
+            $msg = "No existe el registro del cliente.";
         }
-    } else {
-        $msg = "No existe el registro del cliente.";
+    } catch (\Throwable $e) {
+        error_log('Error en validaToken: ' . $e->getMessage());
+        $msg = "Error al validar token.";
     }
+    
     return $msg;
 }
 
 function activarUsuario($id, $con)
 {
-    $sql = $con->prepare("UPDATE usuarios SET activacion = 1, token = '' WHERE id = ?");
-    return $sql->execute([$id]);
+    global $db;
+    
+    try {
+        $result = $db->update('usuarios', ['activacion' => 1, 'token' => ''], 'id', $id);
+        return $result !== null;
+    } catch (\Throwable $e) {
+        error_log('Error en activarUsuario: ' . $e->getMessage());
+        return false;
+    }
 }
 
 function login($usuario, $password, $con)
@@ -154,32 +180,60 @@ function login($usuario, $password, $con)
 
 function solicitaPassword($userId, $con)
 {
+    global $db;
+    
     $token = generarToken();
-
-    $sql = $con->prepare("UPDATE usuarios SET token_password=?, password_request=1 WHERE id = ?");
-    if ($sql->execute([$token, $userId])) {
-        return $token;
+    
+    try {
+        $result = $db->update('usuarios', [
+            'token_password' => $token,
+            'password_request' => 1
+        ], 'id', $userId);
+        
+        if ($result !== null) {
+            return $token;
+        }
+    } catch (\Throwable $e) {
+        error_log('Error en solicitaPassword: ' . $e->getMessage());
     }
+    
     return null;
 }
 
 function verificaTokenRequest($userId, $token, $con)
 {
-    $sql = $con->prepare("SELECT id FROM usuarios WHERE id = ? AND token_password LIKE ? AND password_request=1 LIMIT 1");
-    $sql->execute([$userId, $token]);
-    if ($sql->fetchColumn() > 0) {
-        return true;
+    global $db;
+    
+    try {
+        $result = $db->selectOne('usuarios', 'id', [
+            'id' => $userId,
+            'token_password' => $token,
+            'password_request' => 1
+        ]);
+        
+        return $result !== null && isset($result['id']);
+    } catch (\Throwable $e) {
+        error_log('Error en verificaTokenRequest: ' . $e->getMessage());
+        return false;
     }
-    return false;
 }
 
 function actualizaPassword($userId, $password, $con)
 {
-    $sql = $con->prepare("UPDATE usuarios SET password=?, token_password = '', password_request = 0 WHERE id = ?");
-    if ($sql->execute([$password, $userId])) {
-        return true;
+    global $db;
+    
+    try {
+        $result = $db->update('usuarios', [
+            'password' => $password,
+            'token_password' => '',
+            'password_request' => 0
+        ], 'id', $userId);
+        
+        return $result !== null;
+    } catch (\Throwable $e) {
+        error_log('Error en actualizaPassword: ' . $e->getMessage());
+        return false;
     }
-    return false;
 }
 
 function actualizaPasswordAdmin($userId, $password, $con = null)

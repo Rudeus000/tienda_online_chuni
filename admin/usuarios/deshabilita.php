@@ -6,7 +6,8 @@
  * Web: https://github.com/mroblesdev
  */
 
-require '../config/supabase_config.php';
+$basePath = dirname(__DIR__, 2);
+require_once $basePath . '/config/supabase_config.php';
 
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'admin') {
     header('Location: ' . ADMIN_URL . 'index.php');

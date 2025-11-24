@@ -30,7 +30,7 @@ if (isset($_POST['id'])) {
                 ->single()
                 ->execute();
             
-            $producto = $result->getData();
+            $producto = extractSupabaseData($result);
             $stock = $producto ? $producto['stock'] : 0;
         } catch (Throwable $e) {
             error_log('Error al obtener stock: ' . $e->getMessage());

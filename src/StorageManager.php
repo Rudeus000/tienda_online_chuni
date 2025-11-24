@@ -10,8 +10,11 @@ class StorageManager {
     private $bucketName = 'productos';
 
     public function __construct() {
-        $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-        $dotenv->load();
+        // Solo cargar .env si existe (Railway usa variables de entorno directamente)
+        if (file_exists(__DIR__ . '/../.env')) {
+            $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+            $dotenv->load();
+        }
 
         $base = trim($_ENV['SUPABASE_URL'] ?? '');
         // Corregir casos como "https//..." (falta el :) o sin esquema
@@ -51,7 +54,8 @@ class StorageManager {
             $buckets = $this->storage->listBuckets();
             $bucketExists = false;
             
-            foreach ($buckets->getData() as $bucket) {
+            $bucketsData = method_exists($buckets, 'getData') ? $buckets->getData() : (property_exists($buckets, 'data') ? $buckets->data : []);
+            foreach ($bucketsData as $bucket) {
                 if ($bucket->getName() === $this->bucketName) {
                     $bucketExists = true;
                     break;

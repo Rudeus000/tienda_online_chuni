@@ -32,7 +32,7 @@ try {
         ->single()
         ->execute();
     
-    $rowCompra = $resultCompra->getData();
+    $rowCompra = extractSupabaseData($resultCompra);
     if (!$rowCompra) {
         header("Location: compras.php");
         exit;
@@ -50,7 +50,7 @@ try {
         ->eq('id_compra', $idCompra)
         ->execute();
     
-    $detalles = $resultDetalle->getData() ?? [];
+    $detalles = extractSupabaseData($resultDetalle) ?? [];
 } catch (Throwable $e) {
     error_log('Error al obtener compra: ' . $e->getMessage());
     header("Location: compras.php");

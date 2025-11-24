@@ -19,3 +19,12 @@ $urlImagen = $_POST['urlImagen'] ?? '';
 if ($urlImagen !== '' && file_exists($urlImagen)) {
     unlink($urlImagen);
 }
+
+// Redirigir de vuelta a la página de edición
+$producto_id = $_POST['producto_id'] ?? '';
+if ($producto_id) {
+    header('Location: ' . ADMIN_URL . 'productos/edita.php?id=' . $producto_id);
+} else {
+    header('Location: ' . ADMIN_URL . 'productos/index.php');
+}
+exit;

@@ -52,8 +52,9 @@ class Database {
             }
 
             $result = $query->execute();
-            return $result->getData();
+            return $this->extractData($result);
         } catch (\Throwable $e) {
+            error_log('Error en select: ' . $e->getMessage());
             return [];
         }
     }
@@ -65,12 +66,12 @@ class Database {
                 ->select()  // Seleccionar los datos insertados para obtener el ID
                 ->execute();
 
-            $data = $result->getData();
+            $data = $this->extractData($result);
             if (!empty($data) && isset($data[0]['id'])) {
                 $this->lastInsertId = $data[0]['id'];
                 return $data[0];
             }
-            $errorData = $result->getData();
+            $errorData = $this->extractData($result);
             $errorInfo = method_exists($result, 'getError') ? $result->getError() : null;
             error_log('Insert: No se pudo obtener el ID. Data: ' . print_r($data, true));
             if ($errorInfo) {
@@ -98,9 +99,10 @@ class Database {
                 ->eq($columnaId, $id)
                 ->execute();
 
-            $data = $result->getData();
+            $data = $this->extractData($result);
             return !empty($data) ? $data[0] : null;
         } catch (\Throwable $e) {
+            error_log('Error en update: ' . $e->getMessage());
             return null;
         }
     }
@@ -112,8 +114,9 @@ class Database {
                 ->eq($columnaId, $id)
                 ->execute();
 
-            return $result->getData();
+            return $this->extractData($result);
         } catch (\Throwable $e) {
+            error_log('Error en delete: ' . $e->getMessage());
             return [];
         }
     }
@@ -125,8 +128,9 @@ class Database {
                 'params' => $params
             ])->execute();
 
-            return $result->getData();
+            return $this->extractData($result);
         } catch (\Throwable $e) {
+            error_log('Error en query: ' . $e->getMessage());
             return [];
         }
     }
@@ -143,7 +147,7 @@ class Database {
             }
             
             $result = $query->limit(1)->execute();
-            $data = $result->getData();
+            $data = $this->extractData($result);
             
             if (is_array($data) && !empty($data)) {
                 return $data[0]; // Return the first element if it's an array
@@ -170,6 +174,44 @@ class Database {
         $host = parse_url($url, PHP_URL_HOST) ?? '';
         $parts = explode('.', $host, 2);
         return $parts[1] ?? 'supabase.co';
+    }
+    
+    /**
+     * Extraer datos de la respuesta de Supabase (compatible con diferentes versiones)
+     */
+    private function extractData($result) {
+        // Si el resultado ya es un array, retornarlo directamente
+        if (is_array($result)) {
+            return isset($result['data']) ? $result['data'] : $result;
+        }
+        
+        // Intentar método getData() (versiones antiguas)
+        if (method_exists($result, 'getData')) {
+            try {
+                return $result->getData();
+            } catch (\Throwable $e) {
+                error_log('Error al llamar getData(): ' . $e->getMessage());
+            }
+        }
+        
+        // Intentar propiedad data (algunas versiones)
+        if (property_exists($result, 'data')) {
+            return $result->data;
+        }
+        
+        // Intentar convertir a array usando json_encode/decode
+        try {
+            $data = json_decode(json_encode($result), true);
+            if (is_array($data)) {
+                return isset($data['data']) ? $data['data'] : $data;
+            }
+        } catch (\Throwable $e) {
+            error_log('Error al convertir resultado a array: ' . $e->getMessage());
+        }
+        
+        // Si todo falla, retornar array vacío
+        error_log('No se pudo extraer datos del resultado. Tipo: ' . gettype($result) . ', Clase: ' . (is_object($result) ? get_class($result) : 'N/A'));
+        return [];
     }
     
     public function setLastInsertId($id) {

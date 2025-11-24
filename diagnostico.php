@@ -88,7 +88,7 @@ try {
         ->limit(5);
     
     $result = $query->execute();
-    $data = $result->getData();
+    $data = extractSupabaseData($result);
     
     echo "<p>Resultado de consulta directa: " . count($data) . " productos</p>";
     

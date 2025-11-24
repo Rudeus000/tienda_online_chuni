@@ -4,6 +4,11 @@
  * Configuración para Supabase
  */
 
+// Iniciar buffer de salida ANTES de cualquier cosa para evitar problemas con headers
+if (!ob_get_level()) {
+    ob_start();
+}
+
 // Importaciones deben ir antes de cualquier código ejecutable
 use App\Database;
 use App\StorageManager;
@@ -167,6 +172,35 @@ function getDbConnection() {
 function getConfig($key, $default = '') {
     global $config;
     return $config[$key] ?? $default;
+}
+
+/**
+ * Función helper para extraer datos de respuestas de Supabase
+ * Compatible con diferentes versiones de la API
+ */
+function extractSupabaseData($result) {
+    if (method_exists($result, 'getData')) {
+        return $result->getData();
+    } elseif (property_exists($result, 'data')) {
+        return $result->data;
+    } elseif (is_array($result)) {
+        return isset($result['data']) ? $result['data'] : $result;
+    } else {
+        // Intentar convertir a array
+        $data = json_decode(json_encode($result), true);
+        return is_array($data) && isset($data['data']) ? $data['data'] : ($data ?? []);
+    }
+}
+
+// Función helper para ejecutar queries de Supabase y extraer datos automáticamente
+function executeSupabaseQuery($query) {
+    try {
+        $result = $query->execute();
+        return extractSupabaseData($result);
+    } catch (\Throwable $e) {
+        error_log('Error en executeSupabaseQuery: ' . $e->getMessage());
+        return [];
+    }
 }
 
 // Inicializar sesión para tienda
