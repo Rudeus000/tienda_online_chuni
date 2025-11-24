@@ -1,0 +1,40 @@
+===========================================
+  EJEMPLO DE VARIABLES PARA RAILWAY
+===========================================
+
+Copia y pega estas variables en Railway, reemplazando solo los valores de Supabase:
+
+SUPABASE_URL=https://tu-proyecto-id.supabase.co
+SUPABASE_ANON_KEY=tu_clave_anon_publica_aqui
+KEY_CIFRADO=ABCD.1234-
+METODO_CIFRADO=aes-128-cbc
+
+===========================================
+  INSTRUCCIONES
+===========================================
+
+1. Reemplaza SUPABASE_URL con tu URL de Supabase
+2. Reemplaza SUPABASE_ANON_KEY con tu clave anon de Supabase
+3. KEY_CIFRADO=ABCD.1234-  ← PON ESTO EXACTAMENTE ASÍ
+4. METODO_CIFRADO=aes-128-cbc  ← PON ESTO EXACTAMENTE ASÍ
+
+===========================================
+  VARIABLE OPCIONAL
+===========================================
+
+SUPABASE_SERVICE_ROLE=tu_service_role_key_aqui
+
+⚠️ ESTA VARIABLE ES OPCIONAL
+- NO es necesaria para que funcione la aplicación
+- Solo la necesitas si quieres usar Supabase Storage
+- Si no la configuras, el sistema funcionará igual
+
+===========================================
+  NOTA IMPORTANTE
+===========================================
+
+KEY_CIFRADO=ABCD.1234- es el valor por defecto que ya está en el código.
+NO necesitas cambiarlo. Solo ponlo así tal cual.
+
+===========================================
+

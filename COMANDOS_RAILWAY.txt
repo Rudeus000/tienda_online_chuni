@@ -14,13 +14,20 @@
    3. Selecciona "Deploy from GitHub repo"
    4. Conecta el repositorio: Rudeus000/tienda_online_chuni
    
-   5. Configura Variables de Entorno:
+   5. Configura Variables de Entorno (SITE_URL NO es necesario inicialmente):
       - SUPABASE_URL=tu_url_de_supabase
       - SUPABASE_ANON_KEY=tu_clave_anon
-      - SUPABASE_SERVICE_ROLE=tu_service_role
-      - SITE_URL=https://tu-proyecto-production.up.railway.app
-      - KEY_CIFRADO=tu_clave_secreta
+      - KEY_CIFRADO=ABCD.1234-  (valor por defecto, puedes usarlo así)
       - METODO_CIFRADO=aes-128-cbc
+      
+      ⚠️ SUPABASE_SERVICE_ROLE es OPCIONAL:
+      - NO es necesaria para que funcione
+      - Solo la necesitas si quieres usar Supabase Storage
+      - Si no la tienes, simplemente no la configures
+      
+      ⚠️ NOTA: SITE_URL se detecta automáticamente desde Railway.
+      Si quieres configurarla manualmente, hazlo DESPUÉS del primer despliegue
+      cuando Railway te asigne la URL (ej: tu-proyecto-production.up.railway.app)
 
    6. En Settings → Healthcheck:
       - Healthcheck Path: /healthcheck.php

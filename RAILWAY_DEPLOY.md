@@ -30,16 +30,26 @@ En Railway, ve a la pestaña "Variables" y agrega:
 ```
 SUPABASE_URL=https://tu-proyecto-id.supabase.co
 SUPABASE_ANON_KEY=tu_clave_anon_publica_aqui
-SUPABASE_SERVICE_ROLE=tu_service_role_key_aqui
-SITE_URL=https://tu-proyecto-production.up.railway.app
-KEY_CIFRADO=tu_clave_secreta_fuerte_aqui
+KEY_CIFRADO=ABCD.1234-
 METODO_CIFRADO=aes-128-cbc
 ```
 
-**⚠️ IMPORTANTE:**
-- Railway te asignará una URL automáticamente (ej: `tu-proyecto-production.up.railway.app`)
-- Actualiza `SITE_URL` después de que Railway asigne la URL
-- Usa claves fuertes y seguras
+**Nota sobre KEY_CIFRADO:**
+- Puedes usar el valor por defecto: `ABCD.1234-` (ya configurado en el código)
+- Para producción, puedes cambiarlo por una clave más fuerte si lo deseas
+- Si no configuras esta variable, el código usará `ABCD.1234-` automáticamente
+
+**Nota sobre SUPABASE_SERVICE_ROLE:**
+- **NO es obligatorio** configurar esta variable
+- El sistema funciona perfectamente solo con `SUPABASE_ANON_KEY`
+- Solo la necesitas si quieres usar Supabase Storage para imágenes
+- Si no la configuras, simplemente no la agregues
+
+**⚠️ IMPORTANTE sobre SITE_URL:**
+- **NO es necesario configurar SITE_URL inicialmente** - El código detecta automáticamente la URL desde Railway
+- Si quieres configurarla manualmente después del despliegue, Railway te asignará una URL como: `tu-proyecto-production.up.railway.app`
+- Puedes actualizar `SITE_URL` después del primer despliegue si lo deseas, pero no es obligatorio
+- El sistema detectará automáticamente la URL desde `$_SERVER['HTTP_HOST']`
 
 ### Paso 3: Configurar el Servicio
 
