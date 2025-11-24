@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: tienda-online
+    runtime: php
+    buildCommand: composer install --no-dev --optimize-autoloader
+    startCommand: php -S 0.0.0.0:$PORT -t .
+    envVars:
+      - key: PHP_VERSION
+        value: 8.1
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE
+        sync: false
+      - key: SITE_URL
+        sync: false
+      - key: KEY_CIFRADO
+        sync: false
+      - key: METODO_CIFRADO
+        value: aes-128-cbc
+    healthCheckPath: /
+

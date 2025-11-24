@@ -1,0 +1,46 @@
+===========================================
+  COMANDOS PARA SUBIR A GITHUB Y RENDER
+===========================================
+
+✅ PASO 1: Hacer commit de los cambios
+   git add .
+   git commit -m "Preparar proyecto para Render - Agregar configuración y documentación"
+
+✅ PASO 2: Subir a GitHub
+   git push -u origin main
+
+📝 PASO 3: Desplegar en Render
+
+   1. Ve a https://dashboard.render.com
+   2. Clic en "New +" → "Web Service"
+   3. Conecta el repositorio: Rudeus000/tienda_online_chuni
+   4. Configura:
+      - Name: tienda-online
+      - Runtime: PHP
+      - Build Command: composer install --no-dev --optimize-autoloader
+      - Start Command: php -S 0.0.0.0:$PORT -t .
+   
+   5. Agrega variables de entorno:
+      - SUPABASE_URL=tu_url_de_supabase
+      - SUPABASE_ANON_KEY=tu_clave_anon
+      - SUPABASE_SERVICE_ROLE=tu_service_role
+      - SITE_URL=https://tu-app.onrender.com (se actualiza después)
+      - KEY_CIFRADO=tu_clave_secreta
+      - METODO_CIFRADO=aes-128-cbc
+      - PHP_VERSION=8.1
+
+   6. Clic en "Create Web Service"
+   7. Espera a que termine el despliegue (5-10 minutos)
+
+   8. Una vez listo, actualiza SITE_URL con tu URL de Render
+
+===========================================
+  IMPORTANTE
+===========================================
+
+✅ Ver RENDER_DEPLOY.md para guía completa
+✅ Revisa los logs en Render si hay errores
+✅ Asegúrate de que las variables de entorno estén correctas
+
+===========================================
+

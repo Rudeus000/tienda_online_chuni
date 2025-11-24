@@ -1,0 +1,97 @@
+#-------------------------
+# Operating Specific Junk Files
+#-------------------------
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows shortcuts
+*.lnk
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+#-------------------------
+# Environment Files
+#-------------------------
+# These should never be under version control,
+# as it poses a security risk.
+.env
+.env.local
+.env.*.local
+
+#-------------------------
+# PHP
+#-------------------------
+php_errors.log
+*.log
+error_log
+
+#-------------------------
+# Composer
+#-------------------------
+vendor/
+composer.lock
+tools/
+
+# phpenv local config
+.php-version
+
+#-------------------------
+# IDE / Editor
+#-------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+#-------------------------
+# Archivos de prueba y debug
+#-------------------------
+test_*.php
+debug_*.php
+verificar_*.php
+*_test.php
+
+#-------------------------
+# Archivos temporales
+#-------------------------
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+#-------------------------
+# Imágenes de productos (subir solo estructura)
+#-------------------------
+images/productos/**/*.jpg
+images/productos/**/*.jpeg
+images/productos/**/*.png
+images/productos/**/*.gif
+images/productos/**/*.webp
+
+# Mantener la estructura de carpetas
+!images/productos/.gitkeep
+
+#-------------------------
+# Archivos de configuración sensibles
+#-------------------------
+config/database.php
+admin/config/config.php
+
+# Archivos de sesión
+sessions/
+
+#-------------------------
+# Node modules (si se usa npm)
+#-------------------------
+node_modules/
+package-lock.json
+yarn.lock

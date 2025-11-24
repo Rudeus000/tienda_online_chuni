@@ -1,0 +1,50 @@
+===========================================
+  COMANDOS PARA SUBIR A GITHUB
+===========================================
+
+✅ PASO 1: Verificar archivos (Ya hecho)
+   git status
+
+✅ PASO 2: Agregar archivos (Ya hecho)
+   git add .
+
+✅ PASO 3: Hacer el primer commit
+   git commit -m "Initial commit: Tienda Online con PHP y Supabase"
+
+📝 PASO 4: Crear repositorio en GitHub
+   1. Ve a https://github.com
+   2. Clic en "+" → "New repository"
+   3. Nombre: tienda_online
+   4. Descripción: "Tienda en línea con PHP y Supabase"
+   5. NO marques "Initialize with README"
+   6. Clic en "Create repository"
+
+🔗 PASO 5: Conectar con GitHub
+   git remote add origin https://github.com/TU-USUARIO/tienda_online.git
+   (Reemplaza TU-USUARIO con tu usuario de GitHub)
+
+📤 PASO 6: Subir el código
+   git branch -M main
+   git push -u origin main
+
+===========================================
+  VERIFICACIÓN DE SEGURIDAD ✅
+===========================================
+
+✅ .env está ignorado (correcto)
+✅ vendor/ está ignorado (correcto)
+✅ Archivos de prueba están ignorados (correcto)
+✅ 145 archivos listos para subir
+
+===========================================
+  IMPORTANTE ANTES DE HACER PUSH
+===========================================
+
+1. Asegúrate de que NO tengas un archivo .env en el proyecto
+2. Si tienes un .env, NUNCA lo subas (está en .gitignore)
+3. Verifica las credenciales en el código NO estén hardcodeadas
+4. Todos los datos sensibles deben estar en .env
+
+===========================================
+
+
