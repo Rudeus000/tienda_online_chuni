@@ -49,10 +49,15 @@ try {
     $result = $query->execute();
     $data = $result->getData();
     
+    // Debug: Log para ver qué está retornando Supabase
+    if (empty($data)) {
+        error_log('DEBUG: La consulta de productos retornó vacío. Verificar: 1) Hay productos en la BD, 2) Los productos tienen activo=1, 3) La conexión a Supabase funciona');
+    }
+    
     // Verificar si hay error en la respuesta de Supabase
     if (is_array($data) && isset($data['code']) && isset($data['message'])) {
         // Error de Supabase (ej: columna no existe)
-        error_log('Error en consulta de productos: ' . $data['message']);
+        error_log('Error en consulta de productos: ' . print_r($data, true));
         $resultado = [];
     } elseif (is_array($data) && !empty($data)) {
         // Filtrar solo productos válidos (que tengan id y nombre)
@@ -68,6 +73,7 @@ try {
     $totalRegistros = count($resultado);
 } catch (Throwable $e) {
     error_log('Error al obtener productos: ' . $e->getMessage());
+    error_log('Stack trace: ' . $e->getTraceAsString());
     $resultado = [];
     $totalRegistros = 0;
 }

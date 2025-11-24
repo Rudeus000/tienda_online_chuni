@@ -14,7 +14,8 @@ date_default_timezone_set('America/Lima');
 // Suprimir warnings de deprecación (PHP 8.4)
 // Estos warnings son de librerías externas (Guzzle, Dotenv) que aún no están completamente actualizadas para PHP 8.4
 // No afectan la funcionalidad, pero generan mucho ruido en los logs
-error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+// E_STRICT está deprecado en PHP 8.4, usar solo E_DEPRECATED
+error_reporting(E_ALL & ~E_DEPRECATED);
 ini_set('display_errors', '0'); // No mostrar errores en producción
 ini_set('log_errors', '1'); // Pero sí loggearlos
 
