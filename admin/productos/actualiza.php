@@ -56,34 +56,47 @@ try {
     $resultado = $db->update('productos', $datosProducto, 'id', $id);
     
     if ($resultado !== null) {
-        // Subir imagen principal
+        // Subir imagen principal a Supabase Storage
         if (isset($_FILES['imagen_principal']) && $_FILES['imagen_principal']['error'] == UPLOAD_ERR_OK) {
-        $dir = $basePath . '/images/productos/' . $id . '/';
-        $permitidos = ['jpeg', 'jpg'];
-
+            $permitidos = ['jpeg', 'jpg'];
             $arregloImagen = explode('.', $_FILES['imagen_principal']['name']);
             $extension = strtolower(end($arregloImagen));
 
             if (in_array($extension, $permitidos)) {
-                if (!file_exists($dir)) {
-                    mkdir($dir, 0777, true);
-                }
-
-                $ruta_img = $dir . 'principal.' . $extension;
-                if (!move_uploaded_file($_FILES['imagen_principal']['tmp_name'], $ruta_img)) {
-                    error_log('Error al mover imagen principal del producto ID: ' . $id);
+                try {
+                    global $storage;
+                    if ($storage !== null) {
+                        // Subir a Supabase Storage
+                        $urlImagen = $storage->subirImagenProducto($_FILES['imagen_principal']['tmp_name'], $id, 'principal.jpg');
+                        if (!$urlImagen) {
+                            error_log('Error al subir imagen principal del producto ID: ' . $id . ' a Supabase Storage');
+                            // Intentar guardar localmente como fallback
+                            $dir = $basePath . '/images/productos/' . $id . '/';
+                            if (!file_exists($dir)) {
+                                mkdir($dir, 0777, true);
+                            }
+                            $ruta_img = $dir . 'principal.' . $extension;
+                            move_uploaded_file($_FILES['imagen_principal']['tmp_name'], $ruta_img);
+                        }
+                    } else {
+                        // Fallback: guardar localmente si Storage no está disponible
+                        $dir = $basePath . '/images/productos/' . $id . '/';
+                        if (!file_exists($dir)) {
+                            mkdir($dir, 0777, true);
+                        }
+                        $ruta_img = $dir . 'principal.' . $extension;
+                        move_uploaded_file($_FILES['imagen_principal']['tmp_name'], $ruta_img);
+                    }
+                } catch (\Throwable $e) {
+                    error_log('Error al subir imagen principal: ' . $e->getMessage());
                 }
             }
         }
 
-        // Subir otras imagenes
+        // Subir otras imagenes a Supabase Storage
         if (isset($_FILES['otras_imagenes']) && !empty($_FILES['otras_imagenes']['tmp_name'][0])) {
-            $dir = $basePath . '/images/productos/' . $id . '/';
             $permitidos = ['jpeg', 'jpg'];
-
-            if (!file_exists($dir)) {
-                mkdir($dir, 0777, true);
-            }
+            global $storage;
 
             foreach ($_FILES['otras_imagenes']['tmp_name'] as $key => $tmp_name) {
                 if (empty($tmp_name)) continue;
@@ -92,11 +105,33 @@ try {
                 $arregloImagen = explode('.', $fileName);
                 $extension = strtolower(end($arregloImagen));
 
-                $nuevoNombre = $dir . uniqid() . '.' . $extension;
-
                 if (in_array($extension, $permitidos)) {
-                    if (!move_uploaded_file($tmp_name, $nuevoNombre)) {
-                        error_log('Error al mover imagen adicional del producto ID: ' . $id . ', archivo: ' . $fileName);
+                    try {
+                        if ($storage !== null) {
+                            // Subir a Supabase Storage con nombre único
+                            $nombreArchivo = uniqid() . '.jpg';
+                            $urlImagen = $storage->subirImagenProducto($tmp_name, $id, $nombreArchivo);
+                            if (!$urlImagen) {
+                                error_log('Error al subir imagen adicional del producto ID: ' . $id . ', archivo: ' . $fileName . ' a Supabase Storage');
+                                // Intentar guardar localmente como fallback
+                                $dir = $basePath . '/images/productos/' . $id . '/';
+                                if (!file_exists($dir)) {
+                                    mkdir($dir, 0777, true);
+                                }
+                                $nuevoNombre = $dir . uniqid() . '.' . $extension;
+                                move_uploaded_file($tmp_name, $nuevoNombre);
+                            }
+                        } else {
+                            // Fallback: guardar localmente si Storage no está disponible
+                            $dir = $basePath . '/images/productos/' . $id . '/';
+                            if (!file_exists($dir)) {
+                                mkdir($dir, 0777, true);
+                            }
+                            $nuevoNombre = $dir . uniqid() . '.' . $extension;
+                            move_uploaded_file($tmp_name, $nuevoNombre);
+                        }
+                    } catch (\Throwable $e) {
+                        error_log('Error al subir imagen adicional: ' . $e->getMessage());
                     }
                 }
             }

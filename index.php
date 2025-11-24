@@ -165,14 +165,10 @@ try {
 
                                     <?php
                                     $id = $row['id'];
-                                    $imagen = "images/productos/$id/principal.jpg";
-
-                                    if (!file_exists($imagen)) {
-                                        $imagen = "images/no-photo.jpg";
-                                    }
+                                    $imagen = getImagenProducto($id, 'principal.jpg');
                                     ?>
                                     <a href="details.php?slug=<?php echo $row['slug']; ?>">
-                                        <img src="<?php echo $imagen; ?>" class="img-thumbnail" style="max-height: 300px">
+                                        <img src="<?php echo $imagen; ?>" class="img-thumbnail" style="max-height: 300px" alt="<?php echo htmlspecialchars($row['nombre'], ENT_QUOTES); ?>">
                                     </a>
 
                                     <div class="card-body d-flex flex-column">

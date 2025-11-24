@@ -46,23 +46,9 @@ try {
     exit;
 }
 
-$rutaImagenes = '../../images/productos/' . $id . '/';
-$imagenPrincipal = $rutaImagenes . 'principal.jpg';
-
-$imagenes = [];
-
-if (file_exists($rutaImagenes)) {
-
-    $dirInit = dir($rutaImagenes);
-
-    while (($archivo = $dirInit->read()) !== false) {
-        if ($archivo != 'principal.jpg' && (strpos($archivo, 'jpg') || strpos($archivo, 'jpeg'))) {
-            $image = $rutaImagenes . $archivo;
-            $imagenes[] = $image;
-        }
-    }
-    $dirInit->close();
-}
+// Usar funciones helper para obtener URLs de imágenes
+$imagenPrincipal = getImagenProducto($id, 'principal.jpg');
+$imagenes = getImagenesAdicionalesProducto($id);
 
 require '../header.php';
 
@@ -106,18 +92,34 @@ require '../header.php';
 
             <div class="row mb-2">
                 <div class="col-12 col-md-6">
-                    <?php if (file_exists($imagenPrincipal)) { ?>
-                        <img src="<?php echo $imagenPrincipal . '?id=' . time(); ?>" class="img-thumbnail my-3" style="max-height: 300px"><br>
-                        <button class="btn btn-danger btn-sm" onclick="eliminaImagen('<?php echo $imagenPrincipal; ?>')">Eliminar</button>
+                    <?php if ($imagenPrincipal && strpos($imagenPrincipal, 'no-photo.jpg') === false) { ?>
+                        <img src="<?php echo $imagenPrincipal . '?v=' . time(); ?>" class="img-thumbnail my-3" style="max-height: 300px"><br>
+                        <button class="btn btn-danger btn-sm" onclick="eliminaImagen(<?php echo $id; ?>, 'principal.jpg')">Eliminar</button>
                     <?php } ?>
                 </div>
 
                 <div class="col-12 col-md-6">
                     <div class="row">
-                        <?php foreach ($imagenes as $imagen) { ?>
+                        <?php 
+                        foreach ($imagenes as $index => $imagen) {
+                            // Extraer nombre de archivo de la URL (funciona tanto para URLs de Storage como locales)
+                            $path = parse_url($imagen, PHP_URL_PATH);
+                            // Si la URL es de Supabase Storage, el path será /storage/v1/object/public/productos/{id}/{nombre}
+                            // Si es local, será images/productos/{id}/{nombre}
+                            if (strpos($path, '/storage/v1/object/public/productos/') !== false) {
+                                // URL de Supabase Storage
+                                $parts = explode('/', $path);
+                                $nombreArchivo = end($parts);
+                            } else {
+                                // URL local
+                                $nombreArchivo = basename($path);
+                            }
+                            // Remover parámetros de query si existen
+                            $nombreArchivo = preg_replace('/\?.*$/', '', $nombreArchivo);
+                        ?>
                             <div class="col-4">
-                                <img src="<?php echo $imagen . '?id=' . time(); ?>" class="img-thumbnail my-3" style="max-height: 300px"><br>
-                                <button class="btn btn-danger btn-sm" onclick="eliminaImagen('<?php echo $imagen; ?>')">Eliminar</button>
+                                <img src="<?php echo $imagen . '?v=' . time(); ?>" class="img-thumbnail my-3" style="max-height: 300px"><br>
+                                <button class="btn btn-danger btn-sm" onclick="eliminaImagen(<?php echo $id; ?>, '<?php echo htmlspecialchars($nombreArchivo, ENT_QUOTES); ?>')">Eliminar</button>
                             </div>
                         <?php } ?>
                     </div>
@@ -167,20 +169,30 @@ require '../header.php';
             console.error(error);
         });
 
-    function eliminaImagen(urlImagen) {
+    function eliminaImagen(productoId, nombreArchivo) {
         let url = 'eliminar_imagen.php'
         let formData = new FormData()
-        formData.append('urlImagen', urlImagen)
+        formData.append('productoId', productoId)
+        formData.append('nombreArchivo', nombreArchivo)
 
-        fetch(url, {
-                method: 'POST',
-                body: formData
-            }).then((response) => {
-                if (response.ok) {
-                    location.reload()
-                }
-            })
-            .catch(err => console.log(err));
+        if (confirm('¿Está seguro de que desea eliminar esta imagen?')) {
+            fetch(url, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        location.reload()
+                    } else {
+                        alert('Error al eliminar la imagen: ' + (data.error || 'Error desconocido'))
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    alert('Error al eliminar la imagen')
+                });
+        }
     }
 </script>
 

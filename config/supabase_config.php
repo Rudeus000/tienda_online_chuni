@@ -212,6 +212,81 @@ function executeSupabaseQuery($query) {
     }
 }
 
+/**
+ * Obtiene la URL de una imagen de producto
+ * Intenta usar Supabase Storage primero, luego fallback al sistema local
+ * @param int $productoId ID del producto
+ * @param string $nombreArchivo Nombre del archivo (ej: 'principal.jpg')
+ * @return string URL de la imagen
+ */
+function getImagenProducto($productoId, $nombreArchivo = 'principal.jpg') {
+    global $storage;
+    
+    // Intentar obtener desde Supabase Storage si está disponible
+    if ($storage !== null) {
+        try {
+            $urlStorage = $storage->getUrlImagenProducto($productoId, $nombreArchivo);
+            return $urlStorage;
+        } catch (\Throwable $e) {
+            error_log('Error al obtener URL de Storage: ' . $e->getMessage());
+            // Continuar con fallback local
+        }
+    }
+    
+    // Fallback: usar ruta local
+    $rutaLocal = "images/productos/{$productoId}/{$nombreArchivo}";
+    if (file_exists($rutaLocal)) {
+        return SITE_URL . $rutaLocal;
+    }
+    
+    // Si no existe, devolver imagen por defecto
+    return SITE_URL . 'images/no-photo.jpg';
+}
+
+/**
+ * Obtiene todas las URLs de imágenes adicionales de un producto
+ * @param int $productoId ID del producto
+ * @return array Array de URLs de imágenes
+ */
+function getImagenesAdicionalesProducto($productoId) {
+    global $storage;
+    $imagenes = [];
+    
+    // Intentar obtener desde Supabase Storage si está disponible
+    if ($storage !== null) {
+        try {
+            $archivos = $storage->listarImagenesProducto($productoId);
+            foreach ($archivos as $archivo) {
+                // Excluir la imagen principal
+                if ($archivo !== 'principal.jpg' && (stripos($archivo, '.jpg') !== false || stripos($archivo, '.jpeg') !== false)) {
+                    $imagenes[] = $storage->getUrlImagenProducto($productoId, $archivo);
+                }
+            }
+            if (!empty($imagenes)) {
+                return $imagenes;
+            }
+        } catch (\Throwable $e) {
+            error_log('Error al listar imágenes de Storage: ' . $e->getMessage());
+            // Continuar con fallback local
+        }
+    }
+    
+    // Fallback: leer desde sistema local
+    $dir = "images/productos/{$productoId}/";
+    if (is_dir($dir)) {
+        $dirint = dir($dir);
+        while (($archivo = $dirint->read()) !== false) {
+            if ($archivo !== 'principal.jpg' && $archivo !== '.' && $archivo !== '..' && 
+                (stripos($archivo, '.jpg') !== false || stripos($archivo, '.jpeg') !== false)) {
+                $imagenes[] = SITE_URL . $dir . $archivo;
+            }
+        }
+        $dirint->close();
+    }
+    
+    return $imagenes;
+}
+
 // Inicializar sesión para tienda
 if (session_status() === PHP_SESSION_NONE) {
     session_name('ecommerce_session');

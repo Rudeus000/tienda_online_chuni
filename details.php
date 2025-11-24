@@ -55,25 +55,10 @@ $id = $row['id'];
 $descuento = $row['descuento'];
 $precio = $row['precio'];
 $precio_desc = $precio - (($precio * $descuento) / 100);
-$dir_images = 'images/productos/' . $id . '/';
 
-$rutaImg = $dir_images . 'principal.jpg';
-
-if (!file_exists($rutaImg)) {
-    $rutaImg = 'images/no-photo.jpg';
-}
-
-$imagenes = array();
-if (is_dir($dir_images)) {
-    $dirint = dir($dir_images);
-    while (($archivo = $dirint->read()) !== false) {
-        if ($archivo !== 'principal.jpg' && (stripos($archivo, 'jpg') !== false || stripos($archivo, 'jpeg') !== false)) {
-            $image = $dir_images . $archivo;
-            $imagenes[] = $image;
-        }
-    }
-    $dirint->close();
-}
+// Usar funciones helper para obtener URLs de imágenes
+$rutaImg = getImagenProducto($id, 'principal.jpg');
+$imagenes = getImagenesAdicionalesProducto($id);
 ?>
 
 <!DOCTYPE html>
